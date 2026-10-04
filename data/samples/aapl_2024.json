@@ -1,0 +1,53 @@
+{
+  "company": "AAPL",
+  "year": 2024,
+  "language": "en",
+  "scenes": [
+    {
+      "scene_id": 1,
+      "scene_type": "hook",
+      "speaker": null,
+      "text": "Did you know that Apple’s latest filing admits their internal controls aren’t foolproof, potentially leading to misstatements?",
+      "key_figure": "Internal controls aren’t perfect.",
+      "source_chunk_ids": [
+        "AAPL-2024-8-0042",
+        "AAPL-2024-8-0043"
+      ],
+      "verified": true,
+      "audio_path": null
+    },
+    {
+      "scene_id": 2,
+      "scene_type": "intro",
+      "speaker": null,
+      "text": "This is FinTok — your daily dose of financial knowledge.",
+      "key_figure": null,
+      "source_chunk_ids": [],
+      "verified": true,
+      "audio_path": null
+    },
+    {
+      "scene_id": 3,
+      "scene_type": "explanation",
+      "speaker": null,
+      "text": "Apple Inc. states that its internal controls over financial reporting are designed to ensure accurate financial statements. However, the company acknowledges inherent limitations – controls can’t always prevent or detect misstatements. Furthermore, projections of control effectiveness are subject to change due to evolving conditions, highlighting a potential vulnerability in their reporting process.",
+      "key_figure": "Controls may not prevent misstatements.",
+      "source_chunk_ids": [
+        "AAPL-2024-8-0042",
+        "AAPL-2024-8-0043"
+      ],
+      "verified": true,
+      "audio_path": null
+    },
+    {
+      "scene_id": 4,
+      "scene_type": "outro",
+      "speaker": null,
+      "text": "That's your FinTok for today. See you in the next one.",
+      "key_figure": null,
+      "source_chunk_ids": [],
+      "verified": true,
+      "audio_path": null
+    }
+  ]
+}

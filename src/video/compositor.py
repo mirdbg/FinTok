@@ -43,7 +43,12 @@ class Style:
     bubble_y: int = 1120                  # centro vertical de la burbuja
     bubble_bg: tuple = (225, 233, 245)
     mouth_thresholds: tuple = (0.12, 0.40)  # volumen para boca a medias / abierta
-    disclaimer: str = "Generado con IA · No constituye recomendación de inversión"
+    default_speaker: str = "andrea"       # si la escena no indica quién habla
+    words_per_second: float = 2.6         # para estimar la duración si no hay audio
+    labels: dict = field(default_factory=lambda: {
+        "es": {"source": "Fuente", "disclaimer": "Generado con IA · No constituye recomendación de inversión"},
+        "en": {"source": "Source", "disclaimer": "AI-generated · Not investment advice"},
+    })
     font_paths: list = field(default_factory=lambda: [
         "assets/fonts/Montserrat-Bold.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
@@ -91,6 +96,19 @@ def _envelope(audio: np.ndarray, sr: int, fps: int) -> np.ndarray:
 
 
 # ───────────────────────────── escenas ─────────────────────────────
+
+
+def normalize_spec(spec: dict, style: Style) -> dict:
+    """Rellena valores por defecto para aceptar el JSON tal como lo genera la parte de texto."""
+    spec = dict(spec)
+    spec.setdefault("language", "es")
+    for s in spec["scenes"]:
+        s["speaker"] = s.get("speaker") or style.default_speaker
+        if not s.get("source"):
+            ids = s.get("source_chunk_ids") or []
+            s["source"] = f"{spec.get('company', '')} 10-K {spec.get('year', '')} · {', '.join(ids)}" if ids else None
+    return spec
+
 
 
 def _word_timings(scene: dict, duration: float) -> list[dict]:
@@ -187,21 +205,35 @@ def _subtitle_group(timings: list[dict], t: float, group: int = 4):
     return [w["word"] for w in timings[g0:g0 + group]], idx - g0
 
 
+def _fit_font(draw, text, style, max_size, max_width):
+    size = max_size
+    font = _font(style, size)
+    while draw.textlength(text, font=font) > max_width and size > 24:
+        size -= 4
+        font = _font(style, size)
+    return font
+
+
 def _draw_texts(frame, scene, spec, t_scene, duration, timings, fonts, style):
     d = ImageDraw.Draw(frame)
     W = style.width
+    lang = style.labels.get(spec.get("language", "es"), style.labels["es"])
     # cabecera
     header = f"{spec.get('company', '')} · {spec.get('source_label', '10-K ' + str(spec.get('year', '')))}"
     _draw_centered(d, header.upper(), 120, fonts["small"], style.muted, W)
     d.rounded_rectangle((W - 150, 100, W - 50, 150), 14, fill=style.accent)
-    d.text((W - 128, 106), "IA", font=fonts["small"], fill=(10, 20, 40))
-    # cifra clave con efecto "pop" al empezar la escena
-    if scene.get("key_figure"):
+    d.text((W - 128, 106), "IA" if spec.get("language", "es") == "es" else "AI", font=fonts["small"], fill=(10, 20, 40))
+    # cifra clave con efecto "pop"; "Etiqueta: valor" se separa en dos líneas
+    kf = scene.get("key_figure")
+    if kf:
+        label, value = (kf.rsplit(":", 1) + [""])[:2] if ":" in kf else ("", kf)
+        label, value = label.strip(), value.strip()
         p = min(1.0, t_scene / 0.35)
         scale = 1 + 0.25 * math.sin(p * math.pi) if p < 1 else 1.0
-        f = _font(style, int(170 * scale))
-        _draw_centered(d, scene["key_figure"], 260 - int(30 * (scale - 1)), f, style.accent, W,
-                       stroke=6, stroke_fill=(10, 20, 40))
+        if label:
+            _draw_centered(d, label.upper(), 220, _fit_font(d, label.upper(), style, 48, W - 120), style.text, W)
+        f = _fit_font(d, value, style, int(170 * scale), W - 100)
+        _draw_centered(d, value, 290 - int(30 * (scale - 1)), f, style.accent, W, stroke=6, stroke_fill=(10, 20, 40))
     # subtítulos palabra a palabra
     words, active = _subtitle_group(timings, t_scene)
     font = fonts["sub"]
@@ -218,8 +250,9 @@ def _draw_texts(frame, scene, spec, t_scene, duration, timings, fonts, style):
     # fuente y aviso legal
     src = scene.get("source")
     if src:
-        _draw_centered(d, f"Fuente: {src}", 1740, fonts["tiny"], style.muted, W)
-    _draw_centered(d, style.disclaimer, 1790, fonts["tiny"], style.muted, W)
+        sf = _fit_font(d, f"{lang['source']}: {src}", style, 30, W - 80)
+        _draw_centered(d, f"{lang['source']}: {src}", 1740, sf, style.muted, W)
+    _draw_centered(d, lang["disclaimer"], 1790, fonts["tiny"], style.muted, W)
 
 
 # ───────────────────────────── render ─────────────────────────────
@@ -230,6 +263,7 @@ def render_video(scenes_json: str | dict, avatar_dir: str = "assets/avatar",
                  sr: int = 24000) -> str:
     style = style or Style()
     spec = scenes_json if isinstance(scenes_json, dict) else json.load(open(scenes_json, encoding="utf-8"))
+    spec = normalize_spec(spec, style)
     scenes = [s for s in spec["scenes"] if s.get("verified", True)]  # las no verificadas no se publican
     if not scenes:
         raise ValueError("No hay escenas verificadas que renderizar.")
@@ -241,7 +275,8 @@ def render_video(scenes_json: str | dict, avatar_dir: str = "assets/avatar",
         if p and os.path.exists(p):
             a = _read_wav(p, sr)
         else:
-            a = np.zeros(int(sr * float(s.get("duration_s", 4.0))), dtype=np.float32)
+            est = s.get("duration_s") or max(2.0, len(s["text"].split()) / style.words_per_second)
+            a = np.zeros(int(sr * float(est)), dtype=np.float32)  # sin audio: silencio con duración estimada
         a = np.concatenate([a, np.zeros(int(sr * 0.25), dtype=np.float32)])  # pequeña pausa entre escenas
         tracks.append(a)
         durations.append(len(a) / sr)
@@ -264,7 +299,7 @@ def render_video(scenes_json: str | dict, avatar_dir: str = "assets/avatar",
     frame_idx, t_global = 0, 0.0
     lo, hi = style.mouth_thresholds
     for s, dur in zip(scenes, durations):
-        speaker = s.get("speaker", "andrea")
+        speaker = s["speaker"]
         if speaker not in avatars:
             avatars[speaker] = _load_avatar(avatar_dir, speaker)
         av = avatars[speaker]
