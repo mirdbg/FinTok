@@ -120,7 +120,11 @@ CONSECUTIVE 10-K EXCERPTS:
         max_new_tokens=550,
     )
 
-    data = parse_json_output(raw_output)
+    print("\n=== RAW OUTPUT DE GEMMA ===")
+    print(raw_output)
+    print("=== FIN RAW OUTPUT ===\n")
+
+data = parse_json_output(raw_output)
 
     if "ideas" not in data or not isinstance(data["ideas"], list):
         raise ValueError("Invalid EXTRACT output: expected an 'ideas' list.")
