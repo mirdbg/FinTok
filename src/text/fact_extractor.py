@@ -50,11 +50,43 @@ Return ONLY valid JSON:
 
 
 def parse_json_output(text: str):
-    """Parse JSON even if the model accidentally adds a Markdown fence."""
+    """
+    Parse JSON returned by the model.
+
+    Handles:
+    - accidental ```json markdown fences;
+    - text before/after the JSON;
+    - unescaped control characters generated inside strings.
+    """
     text = text.strip()
-    text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
-    text = re.sub(r"\s*```$", "", text)
-    return json.loads(text)
+
+    # Remove accidental Markdown fences
+    text = re.sub(
+        r"^```(?:json)?\s*",
+        "",
+        text,
+        flags=re.IGNORECASE
+    )
+    text = re.sub(
+        r"\s*```$",
+        "",
+        text
+    )
+
+    # Keep only the JSON object
+    start = text.find("{")
+    end = text.rfind("}")
+
+    if start == -1 or end == -1:
+        raise ValueError(
+            f"No JSON object found in model output:\n{text}"
+        )
+
+    text = text[start:end + 1]
+
+    # strict=False tolerates literal control characters
+    # occasionally produced by the LLM inside JSON strings
+    return json.loads(text, strict=False)
 
 
 def extract_facts(context_df, generate_fn):
