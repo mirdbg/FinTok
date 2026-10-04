@@ -1,0 +1,18 @@
+{
+  "persona": "andrea",
+  "model": "stabilityai/sdxl-turbo (img2img)",
+  "prompt_closed": "Pixar Disney 3D animation style, cartoon character, stylized CGI render, big expressive eyes, smooth skin, young woman with long curly light brown hair and brown eyes, financial analyst wearing a navy blazer, friendly smile with closed mouth, looking at the camera, head and shoulders, soft studio lighting, plain light grey background, 3D cartoon",
+  "closed": {
+    "strength": 0.85,
+    "seed": 0
+  },
+  "mouth_detection": "face-alignment (68 landmarks)",
+  "mouth": {
+    "cx": 260.0,
+    "lip_y": 337.5,
+    "mouth_w": 96.16651916503906,
+    "tilt": -0.30434781312942505,
+    "drop_ratio": 0.15
+  },
+  "background_removal": "rembg (U2-Net)"
+}
