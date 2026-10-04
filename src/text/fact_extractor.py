@@ -34,6 +34,16 @@ Rules:
 - Return fewer than 3 ideas if necessary.
 - If nothing meaningful exists, return an empty list.
 - This is factual extraction, NOT social-media copywriting.
+- Keep each "idea" concise: maximum 40 words.
+- Keep each "evidence" very concise: maximum 30 words.
+- NEVER reproduce full tables or long passages in "evidence".
+- Evidence should contain only the minimum source text needed to support the idea.
+- Be especially careful when reading tables: distinguish values, column labels,
+  years, gains, losses, fair values and totals correctly.
+- Do not infer that a number represents a gain, loss, percentage or total unless
+  the corresponding row and column labels explicitly support that interpretation.
+- "source_chunks" must contain only the exact chunk_id, without adding the word
+  "CHUNK".
 
 Return ONLY valid JSON:
 
@@ -65,12 +75,12 @@ def parse_json_output(text: str):
         r"^```(?:json)?\s*",
         "",
         text,
-        flags=re.IGNORECASE
+        flags=re.IGNORECASE,
     )
     text = re.sub(
         r"\s*```$",
         "",
-        text
+        text,
     )
 
     # Keep only the JSON object
@@ -79,7 +89,7 @@ def parse_json_output(text: str):
 
     if start == -1 or end == -1:
         raise ValueError(
-            f"No JSON object found in model output:\n{text}"
+            f"No complete JSON object found in model output:\n{text}"
         )
 
     text = text[start:end + 1]
@@ -97,9 +107,12 @@ def extract_facts(context_df, generate_fn):
     ----------
     context_df:
         DataFrame containing the consecutive source chunks.
+
     generate_fn:
-        Callable(system_prompt, user_prompt, max_new_tokens) -> (text, latency)
+        Callable(system_prompt, user_prompt, max_new_tokens)
+        -> (text, latency)
     """
+
     target = context_df.iloc[0]
     context_text = context_to_text(context_df)
 
@@ -117,17 +130,15 @@ CONSECUTIVE 10-K EXCERPTS:
     raw_output, latency = generate_fn(
         EXTRACT_SYSTEM,
         user_prompt,
-        max_new_tokens=550,
+        max_new_tokens=700,
     )
 
-    print("\n=== RAW OUTPUT DE GEMMA ===")
-    print(raw_output)
-    print("=== FIN RAW OUTPUT ===\n")
-
-data = parse_json_output(raw_output)
+    data = parse_json_output(raw_output)
 
     if "ideas" not in data or not isinstance(data["ideas"], list):
-        raise ValueError("Invalid EXTRACT output: expected an 'ideas' list.")
+        raise ValueError(
+            "Invalid EXTRACT output: expected an 'ideas' list."
+        )
 
     return {
         "data": data,
