@@ -15,8 +15,8 @@
     },
     {
       "scene_id": 2,
-      "scene_type": "MIRIAM",
-      "speaker": null,
+      "scene_type": "explanation",
+      "speaker": "MIRIAM",
       "text": "This is FinTok — your daily dose of financial knowledge.",
       "key_figure": null,
       "source_chunk_ids": [],
