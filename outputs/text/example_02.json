@@ -1,0 +1,47 @@
+{
+  "company": "AAPL",
+  "year": 2025,
+  "language": "en",
+  "scenes": [
+    {
+      "scene_id": 1,
+      "scene_type": "hook",
+      "speaker": "ANDREA",
+      "text": "Did you know that Apple spent a massive $89.3 billion in 2025 just buying back its own stock and paying dividends?",
+      "key_figure": "Apple buybacks: $89.3B",
+      "source_chunk_ids": ["AAPL-2025-7-0008"],
+      "verified": true,
+      "audio_path": null
+    },
+    {
+      "scene_id": 2,
+      "scene_type": "MIRIAM",
+      "speaker": null,
+      "text": "This is FinTok — your daily dose of financial knowledge.",
+      "key_figure": null,
+      "source_chunk_ids": [],
+      "verified": true,
+      "audio_path": null
+    },
+    {
+      "scene_id": 3,
+      "scene_type": "explanation",
+      "speaker": "MIRIAM",
+      "text": "During 2025, Apple repurchased $89.3 billion of its common stock and paid dividends and dividend equivalents of $15.4 billion, as detailed in their 2025 filing. This significant amount demonstrates the company’s financial health and its commitment to returning value to shareholders. They also raised their quarterly dividend from $0.25 to $0.26 per share.",
+      "key_figure": "Dividends: $15.4B",
+      "source_chunk_ids": ["AAPL-2025-7-0008"],
+      "verified": true,
+      "audio_path": null
+    },
+    {
+      "scene_id": 4,
+      "scene_type": "outro",
+      "speaker": "ANDREA",
+      "text": "That's your FinTok for today. See you in the next one.",
+      "key_figure": null,
+      "source_chunk_ids": [],
+      "verified": true,
+      "audio_path": null
+    }
+  ]
+}
