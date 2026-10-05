@@ -6,7 +6,8 @@ y genera un vídeo vertical 1080x1920 listo para redes sociales.
 
 Por cada fotograma:
   fondo (con zoom lento) → cabecera + cifra clave → avatar en burbuja
-  (boca según el volumen de la voz, rebote y balanceo) → subtítulos palabra
+  (vídeo de EchoMimic si existe; si no, boca según el volumen de la voz,
+  rebote y balanceo) → subtítulos palabra
   a palabra → fuente + aviso legal.
 
 Uso:
@@ -160,18 +161,45 @@ def _load_avatar(avatar_dir: str, speaker: str) -> dict:
     return states
 
 
-def _bubble(avatar: Image.Image, level: float, t: float, appear: float, style: Style) -> Image.Image:
-    """Avatar dentro de un círculo, con rebote al hablar y balanceo suave."""
+class _VideoFrames:
+    """Lee los fotogramas de un vídeo uno a uno (sin cargarlo entero en memoria),
+    ya recortados en cuadrado al tamaño de la burbuja y a los fps del montador."""
+
+    def __init__(self, path: str, size: int, fps: int):
+        self.size, self.last = size, None
+        vf = f"fps={fps},scale={size}:{size}:force_original_aspect_ratio=increase,crop={size}:{size}"
+        self.proc = subprocess.Popen(["ffmpeg", "-loglevel", "error", "-i", path, "-vf", vf,
+                                      "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], stdout=subprocess.PIPE)
+
+    def next(self) -> Image.Image | None:
+        n = self.size * self.size * 3
+        buf = self.proc.stdout.read(n)
+        if len(buf) == n:
+            self.last = Image.frombytes("RGB", (self.size, self.size), buf)
+        return self.last  # si el vídeo se acaba antes que el audio, se queda en el último fotograma
+
+    def close(self):
+        self.proc.kill()
+        self.proc.wait()
+
+
+def _bubble(avatar: Image.Image | None, level: float, t: float, appear: float, style: Style,
+            video_frame: Image.Image | None = None) -> Image.Image:
+    """Avatar dentro de un círculo. Con vídeo (EchoMimic) se usa el fotograma tal cual;
+    con imágenes (respaldo) se añade rebote al hablar y balanceo suave."""
     d = style.bubble_d
-    inner = Image.new("RGBA", (d, d), style.bubble_bg + (255,))
-    # rebote (sube y se estira con la voz) + balanceo continuo
-    sx = 1.0 - 0.02 * level
-    sy = 1.0 + 0.04 * level
-    size = int(d * 1.05)
-    av = avatar.resize((int(size * sx), int(size * sy)), Image.BILINEAR)
-    av = av.rotate(2.5 * math.sin(t * 1.6), resample=Image.BICUBIC, expand=False)
-    dy = int(-18 * level + 4 * math.sin(t * 2.2))
-    inner.alpha_composite(av, ((d - av.width) // 2, d - av.height + int(d * 0.08) + dy))
+    if video_frame is not None:
+        inner = video_frame.convert("RGBA").resize((d, d), Image.BILINEAR)
+    else:
+        inner = Image.new("RGBA", (d, d), style.bubble_bg + (255,))
+        # rebote (sube y se estira con la voz) + balanceo continuo
+        sx = 1.0 - 0.02 * level
+        sy = 1.0 + 0.04 * level
+        size = int(d * 1.05)
+        av = avatar.resize((int(size * sx), int(size * sy)), Image.BILINEAR)
+        av = av.rotate(2.5 * math.sin(t * 1.6), resample=Image.BICUBIC, expand=False)
+        dy = int(-18 * level + 4 * math.sin(t * 2.2))
+        inner.alpha_composite(av, ((d - av.width) // 2, d - av.height + int(d * 0.08) + dy))
     mask = Image.new("L", (d, d), 0)
     ImageDraw.Draw(mask).ellipse((0, 0, d - 1, d - 1), fill=255)
     inner.putalpha(mask)
@@ -305,6 +333,8 @@ def render_video(scenes_json: str | dict, avatar_dir: str = "assets/avatar",
         av = avatars[speaker]
         bg = _load_background(s.get("background_path"), style)
         timings = _word_timings(s, dur)
+        vpath = s.get("avatar_video_path")
+        reader = _VideoFrames(vpath, style.bubble_d, style.fps) if vpath and os.path.exists(vpath) else None
         n = int(round(dur * style.fps))
         for i in range(n):
             t_scene = i / style.fps
@@ -316,12 +346,15 @@ def render_video(scenes_json: str | dict, avatar_dir: str = "assets/avatar",
             shade = Image.new("RGBA", frame.size, (0, 0, 0, 90))  # oscurecer para que se lean los textos
             frame.alpha_composite(shade)
 
-            bub = _bubble(mouth, level, t, min(1.0, t / 0.45), style)
+            vframe = reader.next() if reader else None  # None → respaldo con 3 bocas
+            bub = _bubble(mouth, level, t, min(1.0, t / 0.45), style, video_frame=vframe)
             frame.alpha_composite(bub, ((style.width - bub.width) // 2, style.bubble_y - bub.height // 2))
             _draw_texts(frame, s, spec, t_scene, dur, timings, fonts, style)
 
             ffmpeg.stdin.write(frame.convert("RGB").tobytes())
             frame_idx += 1
+        if reader:
+            reader.close()
     ffmpeg.stdin.close()
     ffmpeg.wait()
 
