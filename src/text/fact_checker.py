@@ -29,11 +29,10 @@ Reject ideas that are mainly:
 - legal boilerplate,
 - too technical without broader relevance,
 - impossible to understand without extensive context,
-- repetitive or trivial.
+- repetitive, common knowledge or trivial.
 
 Be selective.
-
-Select AT MOST ONE idea.
+Select AT MOST ONE idea. It is important to select none if none of the candidates are sufficiently interesting.
 
 Use the original excerpts to verify that the selected idea is properly
 supported.
