@@ -35,11 +35,18 @@ class Style:
     width: int = 1080
     height: int = 1920
     fps: int = 30
-    bg_top: tuple = (12, 20, 45)          # degradado de fondo si no hay imagen
-    bg_bottom: tuple = (20, 60, 90)
-    accent: tuple = (0, 214, 143)         # verde "finanzas"
+    bg_top: tuple = (18, 6, 38)           # degradado de fondo si no hay imagen (morado oscuro)
+    bg_bottom: tuple = (58, 18, 96)
+    accent: tuple = (178, 102, 255)       # morado FinTok
+    accent2: tuple = (255, 92, 205)       # rosa para brillos y degradados
     text: tuple = (255, 255, 255)
-    muted: tuple = (190, 200, 215)
+    muted: tuple = (214, 196, 240)        # lavanda
+    brand: str = "FinTok"
+    brand_scenes: tuple = ("intro", "outro")  # escenas fijas con edición especial
+    brand_taglines: dict = field(default_factory=lambda: {
+        "es": {"intro": "Tu dosis diaria de finanzas", "outro": "¡Nos vemos en el próximo!"},
+        "en": {"intro": "Your daily dose of finance", "outro": "See you in the next one!"},
+    })
     bubble_d: int = 560                   # diámetro de la burbuja del avatar
     bubble_y: int = 1120                  # centro vertical de la burbuja
     bubble_bg: tuple = (225, 233, 245)
@@ -206,13 +213,85 @@ def _bubble(avatar: Image.Image | None, level: float, t: float, appear: float, s
 
     ring = 14
     out = Image.new("RGBA", (d + 2 * ring, d + 2 * ring), (0, 0, 0, 0))
-    ImageDraw.Draw(out).ellipse((0, 0, out.width - 1, out.height - 1), fill=style.accent + (255,))
+    g = np.linspace(0, 1, out.height)[:, None, None]
+    grad = ((1 - g) * np.array(style.accent2) + g * np.array(style.accent)).repeat(out.width, axis=1)
+    ring_img = Image.fromarray(grad.astype(np.uint8)).convert("RGBA")
+    rmask = Image.new("L", out.size, 0)
+    ImageDraw.Draw(rmask).ellipse((0, 0, out.width - 1, out.height - 1), fill=255)
+    out.paste(ring_img, (0, 0), rmask)
     out.alpha_composite(inner, (ring, ring))
     # entrada con rebote al inicio del vídeo
     if appear < 1:
         s = max(0.01, 1 + 0.15 * math.sin(appear * math.pi) - (1 - appear) ** 2)
         out = out.resize((max(1, int(out.width * s)), max(1, int(out.height * s))), Image.BILINEAR)
     return out
+
+
+# ───────────────────────── escenas de marca ─────────────────────────
+
+
+def _ease_out_back(x: float) -> float:
+    x = min(max(x, 0.0), 1.0)
+    c = 1.70158
+    return 1 + (c + 1) * (x - 1) ** 3 + c * (x - 1) ** 2
+
+
+def _brand_background(frame: Image.Image, t_scene: float, style: Style):
+    """Fondo de las escenas intro/outro: degradado morado, haz de luz giratorio y destellos."""
+    W, H = style.width, style.height
+    over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(over)
+    # rayos de luz girando desde el centro de la burbuja
+    cx, cy = W // 2, style.bubble_y
+    for k in range(12):
+        a = t_scene * 0.6 + k * math.pi / 6
+        a2 = a + math.pi / 24
+        r = 1600
+        d.polygon([(cx, cy), (cx + r * math.cos(a), cy + r * math.sin(a)),
+                   (cx + r * math.cos(a2), cy + r * math.sin(a2))], fill=style.accent + (38,))
+    # destellos (posiciones pseudoaleatorias fijas que parpadean)
+    rng = np.random.default_rng(7)
+    for _ in range(40):
+        x, y = rng.uniform(0, W), rng.uniform(0, H)
+        ph, sp = rng.uniform(0, 6.28), rng.uniform(1.5, 4)
+        a = int(200 * max(0.0, math.sin(t_scene * sp + ph)))
+        r = rng.uniform(3, 8)
+        col = style.accent2 if rng.random() < 0.4 else (255, 255, 255)
+        d.ellipse((x - r, y - r, x + r, y + r), fill=col + (a,))
+    frame.alpha_composite(over)
+
+
+def _brand_overlay(frame: Image.Image, scene: dict, spec: dict, t_scene: float, dur: float, style: Style):
+    """Logo FinTok con efecto pop, eslogan y destello de transición al empezar y al acabar."""
+    W = style.width
+    d = ImageDraw.Draw(frame)
+    lang = spec.get("language", "es")
+    kind = scene.get("scene_type")
+    # logo con rebote y ligero "latido"
+    p = _ease_out_back(t_scene / 0.6)
+    size = max(10, int(190 * p * (1 + 0.03 * math.sin(t_scene * 5))))
+    font = _font(style, size)
+    tw = d.textlength(style.brand, font=font)
+    y = 300 - size // 2
+    glow = Image.new("RGBA", frame.size, (0, 0, 0, 0))
+    ImageDraw.Draw(glow).text(((W - tw) / 2, y), style.brand, font=font, fill=style.accent2 + (255,))
+    frame.alpha_composite(glow.filter(ImageFilter.GaussianBlur(18)))
+    d.text(((W - tw) / 2, y), style.brand, font=font, fill=(255, 255, 255),
+           stroke_width=6, stroke_fill=style.accent)
+    # eslogan que aparece deslizando
+    tag = style.brand_taglines.get(lang, style.brand_taglines["es"]).get(kind, "")
+    if tag:
+        q = min(1.0, max(0.0, (t_scene - 0.35) / 0.4))
+        f2 = _font(style, 52)
+        tw2 = d.textlength(tag, font=f2)
+        x = (W - tw2) / 2 + (1 - q) * 120
+        d.rounded_rectangle((x - 30, 470, x + tw2 + 30, 550), 40, fill=style.accent + (int(230 * q),))
+        d.text((x, 478), tag, font=f2, fill=(255, 255, 255, int(255 * q)))
+    # destello morado al entrar y al salir de la escena
+    fl = max(0.0, 1 - t_scene / 0.25) if kind == "intro" else 0.0
+    fl = max(fl, max(0.0, 1 - (dur - t_scene) / 0.3) if kind == "outro" else 0.0)
+    if fl > 0:
+        frame.alpha_composite(Image.new("RGBA", frame.size, style.accent + (int(220 * fl),)))
 
 
 # ───────────────────────────── textos ─────────────────────────────
@@ -250,7 +329,7 @@ def _draw_texts(frame, scene, spec, t_scene, duration, timings, fonts, style):
     header = f"{spec.get('company', '')} · {spec.get('source_label', '10-K ' + str(spec.get('year', '')))}"
     _draw_centered(d, header.upper(), 120, fonts["small"], style.muted, W)
     d.rounded_rectangle((W - 150, 100, W - 50, 150), 14, fill=style.accent)
-    d.text((W - 128, 106), "IA" if spec.get("language", "es") == "es" else "AI", font=fonts["small"], fill=(10, 20, 40))
+    d.text((W - 128, 106), "IA" if spec.get("language", "es") == "es" else "AI", font=fonts["small"], fill=(255, 255, 255))
     # cifra clave con efecto "pop"; "Etiqueta: valor" se separa en dos líneas
     kf = scene.get("key_figure")
     if kf:
@@ -261,7 +340,7 @@ def _draw_texts(frame, scene, spec, t_scene, duration, timings, fonts, style):
         if label:
             _draw_centered(d, label.upper(), 220, _fit_font(d, label.upper(), style, 48, W - 120), style.text, W)
         f = _fit_font(d, value, style, int(170 * scale), W - 100)
-        _draw_centered(d, value, 290 - int(30 * (scale - 1)), f, style.accent, W, stroke=6, stroke_fill=(10, 20, 40))
+        _draw_centered(d, value, 290 - int(30 * (scale - 1)), f, style.accent, W, stroke=6, stroke_fill=(255, 255, 255))
     # subtítulos palabra a palabra
     words, active = _subtitle_group(timings, t_scene)
     font = fonts["sub"]
@@ -345,11 +424,16 @@ def render_video(scenes_json: str | dict, avatar_dir: str = "assets/avatar",
             frame = _ken_burns(bg, t_scene / max(dur, 1e-6), style).convert("RGBA")
             shade = Image.new("RGBA", frame.size, (0, 0, 0, 90))  # oscurecer para que se lean los textos
             frame.alpha_composite(shade)
+            is_brand = s.get("scene_type") in style.brand_scenes
+            if is_brand:
+                _brand_background(frame, t_scene, style)
 
             vframe = reader.next() if reader else None  # None → respaldo con 3 bocas
             bub = _bubble(mouth, level, t, min(1.0, t / 0.45), style, video_frame=vframe)
             frame.alpha_composite(bub, ((style.width - bub.width) // 2, style.bubble_y - bub.height // 2))
             _draw_texts(frame, s, spec, t_scene, dur, timings, fonts, style)
+            if is_brand:
+                _brand_overlay(frame, s, spec, t_scene, dur, style)
 
             ffmpeg.stdin.write(frame.convert("RGB").tobytes())
             frame_idx += 1
