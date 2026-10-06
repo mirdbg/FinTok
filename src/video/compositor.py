@@ -111,7 +111,7 @@ def normalize_spec(spec: dict, style: Style) -> dict:
     spec = dict(spec)
     spec.setdefault("language", "es")
     for s in spec["scenes"]:
-        s["speaker"] = s.get("speaker") or style.default_speaker
+        s["speaker"] = (s.get("speaker") or style.default_speaker).strip().lower()  # "ANDREA" → "andrea"
         if not s.get("source"):
             ids = s.get("source_chunk_ids") or []
             s["source"] = f"{spec.get('company', '')} 10-K {spec.get('year', '')} · {', '.join(ids)}" if ids else None
