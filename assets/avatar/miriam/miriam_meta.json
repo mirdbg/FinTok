@@ -1,0 +1,19 @@
+{
+  "persona": "miriam",
+  "model": "stabilityai/sdxl-turbo (img2img)",
+  "prompt_closed": "Pixar Disney 3D animation style, cartoon character, stylized CGI render, big expressive eyes, smooth skin, young woman with long straigh light black hair, fair skin and brown eyes, financial analyst wearing a navy blazer, friendly smile with closed mouth, looking at the camera, head and shoulders, soft studio lighting, plain light grey background, 3D cartoon",
+  "closed": {
+    "strength": 0.85,
+    "seed": 0
+  },
+  "mouth_detection": "face-alignment (68 landmarks)",
+  "mouth": {
+    "cx": 292.0,
+    "lip_y": 177.5,
+    "mouth_w": 58.0,
+    "tilt": 0.0,
+    "drop_half": 0.1,
+    "drop_open": 0.15
+  },
+  "background_removal": "rembg (U2-Net)"
+}
