@@ -88,9 +88,9 @@ Una aplicación **Gradio** desplegada en un Space de Hugging Face con **ZeroGPU*
 Elige la empresa, el ejercicio fiscal y la sección del 10-K. FinTok se encarga de explorar el contenido y encontrar una historia relevante.
 
 <p align="center">
-  <img src="docs/img/Captura%201.png" width="47%" alt="Página principal de FinTok"/>
+  <img src="docs/img/webapp/Captura%201.png" width="47%" alt="Página principal de FinTok"/>
   &nbsp;&nbsp;
-  <img src="docs/img/Captura%202.png" width="47%" alt="Selección de empresa, año y sección del 10-K"/>
+  <img src="docs/img/webapp/Captura%202.png" width="47%" alt="Selección de empresa, año y sección del 10-K"/>
 </p>
 
 <br>
@@ -100,9 +100,9 @@ Elige la empresa, el ejercicio fiscal y la sección del 10-K. FinTok se encarga 
 La aplicación devuelve un guion de cuatro escenas —hook, intro, explicación y outro— manteniendo la trazabilidad hasta los chunks originales del 10-K.
 
 <p align="center">
-  <img src="docs/img/Captura%203.png" width="47%" alt="Primera parte del guion generado"/>
+  <img src="docs/img/webapp/Captura%203.png" width="47%" alt="Primera parte del guion generado"/>
   &nbsp;&nbsp;
-  <img src="docs/img/Captura%204.png" width="47%" alt="Guion generado y trazabilidad a las fuentes"/>
+  <img src="docs/img/webapp/Captura%204.png" width="47%" alt="Guion generado y trazabilidad a las fuentes"/>
 </p>
 
 <br>
