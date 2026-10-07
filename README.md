@@ -117,6 +117,13 @@ Las cuatro escenas se generan con las voces de Andrea y Miriam mediante F5-TTS. 
   <img src="docs/img/webapp/Captura%206.png" width="47%" alt="Descarga del JSON y los audios"/>
 </p>
 
+
+### ¿Qué ocurre por detrás?
+
+La interfaz anterior es la capa visible de FinTok, pero cada generación ejecuta el pipeline real del proyecto. A partir de la selección del usuario, la aplicación recupera contexto del 10-K, extrae y valida una historia, genera el guion y, finalmente, sintetiza las cuatro pistas de voz.
+
+El siguiente diagrama muestra cómo se coordinan estos pasos dentro del Space:
+
 ```mermaid
 sequenceDiagram
     autonumber
