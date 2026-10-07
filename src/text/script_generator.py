@@ -9,6 +9,19 @@ INTRO = "This is FinTok — your daily dose of financial knowledge."
 OUTRO = "That's your FinTok for today. See you in the next one."
 
 
+# Map corpus tickers to the company names used in FinTok.
+# Keeping this mapping deterministic avoids asking the LLM to infer
+# the company name from the filing text.
+COMPANY_NAMES = {
+    "AAPL": "Apple",
+    "MSFT": "Microsoft",
+    "NVDA": "NVIDIA",
+    "GOOGL": "Alphabet",
+    "META": "Meta",
+    "AMZN": "Amazon",
+}
+
+
 WRITE_SYSTEM = """
 You are a financial content writer for FinTok, a platform that transforms
 official 10-K filings into short, engaging and easy-to-understand financial content.
@@ -157,7 +170,15 @@ def generate_script(context_df, selection, generate_fn):
     context_text = context_to_text(context_df)
     selected_story = json.dumps(selection_data, ensure_ascii=False)
 
+    # Company metadata comes deterministically from the corpus.
+    target = context_df.iloc[0]
+    ticker = str(target["ticker"]).strip().upper()
+    company = COMPANY_NAMES.get(ticker, ticker)
+
     user_prompt = f"""
+COMPANY: {company}
+TICKER: {ticker}
+
 SELECTED FINANCIAL STORY:
 ----------------
 {selected_story}
@@ -171,8 +192,10 @@ SOURCE 10-K EXCERPTS:
 Write the hook, explanation and their visual highlights.
 
 Remember:
+- the company is {company};
 - hook: maximum 25 words;
 - explanation: maximum 70 words;
+- identify {company} naturally in the explanation;
 - use only information supported by the source.
 """.strip()
 
@@ -191,8 +214,11 @@ Remember:
         "explanation_highlight",
     }
     missing = required - set(data)
+
     if missing:
-        raise ValueError(f"Invalid WRITE output; missing fields: {sorted(missing)}")
+        raise ValueError(
+            f"Invalid WRITE output; missing fields: {sorted(missing)}"
+        )
 
     return {
         "data": data,
@@ -210,11 +236,17 @@ def build_video_json(context_df, script):
         return None
 
     write_data = script["data"] if "data" in script else script
+
     target = context_df.iloc[0]
+
+    ticker = str(target["ticker"]).strip().upper()
+    company = COMPANY_NAMES.get(ticker, ticker)
+
     source_chunk_ids = context_df["chunk_id"].tolist()
 
     video_data = {
-        "company": str(target["ticker"]),
+        "company": company,
+        "ticker": ticker,
         "year": int(target["fiscal_year"]),
         "language": "en",
         "scenes": [
@@ -262,21 +294,32 @@ def build_video_json(context_df, script):
     }
 
     # Deterministic structural validation.
+    assert video_data["company"]
+    assert video_data["ticker"]
     assert len(video_data["scenes"]) == 4
+
     assert [s["scene_type"] for s in video_data["scenes"]] == [
-        "hook", "intro", "explanation", "outro"
+        "hook",
+        "intro",
+        "explanation",
+        "outro",
     ]
+
     assert video_data["scenes"][1]["text"] == INTRO
     assert video_data["scenes"][3]["text"] == OUTRO
+
     assert video_data["scenes"][1]["key_figure"] is None
     assert video_data["scenes"][3]["key_figure"] is None
+
     assert video_data["scenes"][1]["source_chunk_ids"] == []
     assert video_data["scenes"][3]["source_chunk_ids"] == []
 
     available_ids = set(context_df["chunk_id"])
+
     for scene in video_data["scenes"]:
         assert scene["speaker"] in {"MIRIAM", "ANDREA"}
         assert scene["audio_path"] is None
+
         for chunk_id in scene["source_chunk_ids"]:
             assert chunk_id in available_ids
 
