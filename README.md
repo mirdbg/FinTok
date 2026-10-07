@@ -81,6 +81,42 @@ Una aplicación **Gradio** desplegada en un Space de Hugging Face con **ZeroGPU*
 3. La app busca sola una historia dentro de esa sección, escribe el guion y genera las cuatro pistas de voz, mostrando en cada momento en qué paso está.
 4. Resultado: el guion de las 4 escenas, con la cifra que aparecería en pantalla, los `chunk_id` de origen y **4 reproductores de audio** (Andrea y Miriam).
 
+### La demo paso a paso
+
+**1 · Selecciona qué quieres explorar**
+
+Elige la empresa, el ejercicio fiscal y la sección del 10-K. FinTok se encarga de explorar el contenido y encontrar una historia relevante.
+
+<p align="center">
+  <img src="docs/img/Captura%201.png" width="47%" alt="Página principal de FinTok"/>
+  &nbsp;&nbsp;
+  <img src="docs/img/Captura%202.png" width="47%" alt="Selección de empresa, año y sección del 10-K"/>
+</p>
+
+<br>
+
+**2 · FinTok encuentra y construye la historia**
+
+La aplicación devuelve un guion de cuatro escenas —hook, intro, explicación y outro— manteniendo la trazabilidad hasta los chunks originales del 10-K.
+
+<p align="center">
+  <img src="docs/img/Captura%203.png" width="47%" alt="Primera parte del guion generado"/>
+  &nbsp;&nbsp;
+  <img src="docs/img/Captura%204.png" width="47%" alt="Guion generado y trazabilidad a las fuentes"/>
+</p>
+
+<br>
+
+**3 · Escucha y descarga el resultado**
+
+Las cuatro escenas se generan con las voces de Andrea y Miriam mediante F5-TTS. El resultado completo puede descargarse como JSON junto con las pistas de audio.
+
+<p align="center">
+  <img src="docs/img/Captura%205.png" width="47%" alt="Audios generados por FinTok"/>
+  &nbsp;&nbsp;
+  <img src="docs/img/Captura%206.png" width="47%" alt="Descarga del JSON y los audios"/>
+</p>
+
 ```mermaid
 sequenceDiagram
     autonumber
