@@ -112,9 +112,9 @@ La aplicación devuelve un guion de cuatro escenas —hook, intro, explicación 
 Las cuatro escenas se generan con las voces de Andrea y Miriam mediante F5-TTS. El resultado completo puede descargarse como JSON junto con las pistas de audio.
 
 <p align="center">
-  <img src="docs/img/Captura%205.png" width="47%" alt="Audios generados por FinTok"/>
+  <img src="docs/img/webapp/Captura%205.png" width="47%" alt="Audios generados por FinTok"/>
   &nbsp;&nbsp;
-  <img src="docs/img/Captura%206.png" width="47%" alt="Descarga del JSON y los audios"/>
+  <img src="docs/img/webapp/Captura%206.png" width="47%" alt="Descarga del JSON y los audios"/>
 </p>
 
 ```mermaid
