@@ -221,7 +221,7 @@ def build_video_json(context_df, script):
             {
                 "scene_id": 1,
                 "scene_type": "hook",
-                "speaker": None,
+                "speaker": "ANDREA",
                 "text": write_data["hook"],
                 "key_figure": write_data["hook_highlight"],
                 "source_chunk_ids": source_chunk_ids,
@@ -231,7 +231,7 @@ def build_video_json(context_df, script):
             {
                 "scene_id": 2,
                 "scene_type": "intro",
-                "speaker": None,
+                "speaker": "MIRIAM",
                 "text": INTRO,
                 "key_figure": None,
                 "source_chunk_ids": [],
@@ -241,7 +241,7 @@ def build_video_json(context_df, script):
             {
                 "scene_id": 3,
                 "scene_type": "explanation",
-                "speaker": None,
+                "speaker": "MIRIAM",
                 "text": write_data["explanation"],
                 "key_figure": write_data["explanation_highlight"],
                 "source_chunk_ids": source_chunk_ids,
@@ -251,7 +251,7 @@ def build_video_json(context_df, script):
             {
                 "scene_id": 4,
                 "scene_type": "outro",
-                "speaker": None,
+                "speaker": "ANDREA",
                 "text": OUTRO,
                 "key_figure": None,
                 "source_chunk_ids": [],
