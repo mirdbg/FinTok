@@ -1,0 +1,55 @@
+{
+  "company": "AMZN",
+  "year": 2025,
+  "language": "en",
+  "scenes": [
+    {
+      "scene_id": 1,
+      "scene_type": "hook",
+      "speaker": "ANDREA",
+      "text": "Did you know that Amazon’s International segment saw a $4.9 billion sales jump last year, largely thanks to currency shifts?",
+      "key_figure": "International sales surge",
+      "source_chunk_ids": [
+        "AMZN-2025-7A-0002",
+        "AMZN-2025-7A-0003",
+        "AMZN-2025-7A-0004"
+      ],
+      "verified": true,
+      "audio_path": "/tmp/fintok_audio_gtgdq5lp/wav/scene_01_hook_andrea.wav"
+    },
+    {
+      "scene_id": 2,
+      "scene_type": "intro",
+      "speaker": "MIRIAM",
+      "text": "This is FinTok — your daily dose of financial knowledge.",
+      "key_figure": null,
+      "source_chunk_ids": [],
+      "verified": true,
+      "audio_path": "/tmp/fintok_audio_gtgdq5lp/wav/scene_02_intro_miriam.wav"
+    },
+    {
+      "scene_id": 3,
+      "scene_type": "explanation",
+      "speaker": "MIRIAM",
+      "text": "Amazon’s International segment experienced a significant $4.9 billion increase in net sales in 2025, primarily driven by fluctuations in foreign exchange rates. This growth was largely due to the impact of currencies like Euros, British Pounds, and Japanese Yen on sales denominated in those currencies. These fluctuations resulted in gains when the US dollar weakened against these currencies, boosting reported revenue.",
+      "key_figure": "4.9 billion sales increase",
+      "source_chunk_ids": [
+        "AMZN-2025-7A-0002",
+        "AMZN-2025-7A-0003",
+        "AMZN-2025-7A-0004"
+      ],
+      "verified": true,
+      "audio_path": "/tmp/fintok_audio_gtgdq5lp/wav/scene_03_explanation_miriam.wav"
+    },
+    {
+      "scene_id": 4,
+      "scene_type": "outro",
+      "speaker": "ANDREA",
+      "text": "That's your FinTok for today. See you in the next one.",
+      "key_figure": null,
+      "source_chunk_ids": [],
+      "verified": true,
+      "audio_path": "/tmp/fintok_audio_gtgdq5lp/wav/scene_04_outro_andrea.wav"
+    }
+  ]
+}

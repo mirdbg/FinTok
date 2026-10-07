@@ -1,0 +1,55 @@
+{
+  "company": "NVDA",
+  "year": 2025,
+  "language": "en",
+  "scenes": [
+    {
+      "scene_id": 1,
+      "scene_type": "hook",
+      "speaker": "ANDREA",
+      "text": "Did you know NVIDIA repurchased a staggering $34 billion in stock last year? What's driving this massive investment?",
+      "key_figure": "NVIDIA's $34 billion stock buyback",
+      "source_chunk_ids": [
+        "NVDA-2025-7-0020",
+        "NVDA-2025-7-0021",
+        "NVDA-2025-7-0022"
+      ],
+      "verified": true,
+      "audio_path": "/tmp/fintok_audio_081vyde6/wav/scene_01_hook_andrea.wav"
+    },
+    {
+      "scene_id": 2,
+      "scene_type": "intro",
+      "speaker": "MIRIAM",
+      "text": "This is FinTok — your daily dose of financial knowledge.",
+      "key_figure": null,
+      "source_chunk_ids": [],
+      "verified": true,
+      "audio_path": "/tmp/fintok_audio_081vyde6/wav/scene_02_intro_miriam.wav"
+    },
+    {
+      "scene_id": 3,
+      "scene_type": "explanation",
+      "speaker": "MIRIAM",
+      "text": "In fiscal year 2025, NVIDIA repurchased 310 million shares of its common stock, totaling $34 billion. This significant action was primarily undertaken to offset dilution caused by employee stock option grants.  The company maintains sufficient liquidity to meet its obligations and continues to evaluate opportunities for further share repurchases, demonstrating confidence in its financial position.  Notably, the 1% excise tax on share repurchases is included in the cost.",
+      "key_figure": "NVIDIA repurchased 310 million shares for $34 billion.",
+      "source_chunk_ids": [
+        "NVDA-2025-7-0020",
+        "NVDA-2025-7-0021",
+        "NVDA-2025-7-0022"
+      ],
+      "verified": true,
+      "audio_path": "/tmp/fintok_audio_081vyde6/wav/scene_03_explanation_miriam.wav"
+    },
+    {
+      "scene_id": 4,
+      "scene_type": "outro",
+      "speaker": "ANDREA",
+      "text": "That's your FinTok for today. See you in the next one.",
+      "key_figure": null,
+      "source_chunk_ids": [],
+      "verified": true,
+      "audio_path": "/tmp/fintok_audio_081vyde6/wav/scene_04_outro_andrea.wav"
+    }
+  ]
+}

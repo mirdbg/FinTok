@@ -1,0 +1,55 @@
+{
+  "company": "GOOGL",
+  "year": 2024,
+  "language": "en",
+  "scenes": [
+    {
+      "scene_id": 1,
+      "scene_type": "hook",
+      "speaker": "ANDREA",
+      "text": "Did you know that Alphabet’s investment portfolio grew by over $6 billion in the last year, largely due to a specific accounting method?",
+      "key_figure": "Alphabet’s investment growth",
+      "source_chunk_ids": [
+        "GOOGL-2024-7A-0002",
+        "GOOGL-2024-7A-0003",
+        "GOOGL-2024-7A-0004"
+      ],
+      "verified": true,
+      "audio_path": "/tmp/fintok_audio_bcrz5kez/wav/scene_01_hook_andrea.wav"
+    },
+    {
+      "scene_id": 2,
+      "scene_type": "intro",
+      "speaker": "MIRIAM",
+      "text": "This is FinTok — your daily dose of financial knowledge.",
+      "key_figure": null,
+      "source_chunk_ids": [],
+      "verified": true,
+      "audio_path": "/tmp/fintok_audio_bcrz5kez/wav/scene_02_intro_miriam.wav"
+    },
+    {
+      "scene_id": 3,
+      "scene_type": "explanation",
+      "speaker": "MIRIAM",
+      "text": "Alphabet’s non-marketable equity investments increased significantly from $28.8 billion to $35.5 billion. This change is primarily attributed to the ‘measurement alternative’ accounting method, which allows for valuation adjustments based on observable transactions rather than relying on market prices. This means the reported value reflects a specific transaction, not necessarily the current fair value, and can be influenced by factors like early-stage company valuations and potential future losses.",
+      "key_figure": "Increase in non-marketable equity value ($6 billion)",
+      "source_chunk_ids": [
+        "GOOGL-2024-7A-0002",
+        "GOOGL-2024-7A-0003",
+        "GOOGL-2024-7A-0004"
+      ],
+      "verified": true,
+      "audio_path": "/tmp/fintok_audio_bcrz5kez/wav/scene_03_explanation_miriam.wav"
+    },
+    {
+      "scene_id": 4,
+      "scene_type": "outro",
+      "speaker": "ANDREA",
+      "text": "That's your FinTok for today. See you in the next one.",
+      "key_figure": null,
+      "source_chunk_ids": [],
+      "verified": true,
+      "audio_path": "/tmp/fintok_audio_bcrz5kez/wav/scene_04_outro_andrea.wav"
+    }
+  ]
+}
