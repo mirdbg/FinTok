@@ -275,7 +275,7 @@ def build_video_json(context_df, script):
 
     available_ids = set(context_df["chunk_id"])
     for scene in video_data["scenes"]:
-        assert scene["speaker"] is None
+        assert scene["speaker"] in {"MIRIAM", "ANDREA"}
         assert scene["audio_path"] is None
         for chunk_id in scene["source_chunk_ids"]:
             assert chunk_id in available_ids
