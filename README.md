@@ -8,7 +8,7 @@ FinTok es una plataforma multimodal que transforma información financiera ofici
 
 <img src="docs/img/demo.gif" width="270" alt="Demo de FinTok: vídeo generado sobre el 10-K 2025 de Apple"/>
 
-[▶ Ver el vídeo completo con audio (MP4)](docs/demo_AAPL_2025.mp4) · [🤗 Probar la demo en Hugging Face](https://huggingface.co/spaces/mirdbg/FinTok)
+[▶ Ver el vídeo completo con audio (MP4)](docs/demo_NVIDIA_2025.mp4) · [🤗 Probar la demo en Hugging Face](https://huggingface.co/spaces/mirdbg/FinTok)
 
 `Python` · `Gemma 3 4B` · `F5-TTS` · `SDXL Turbo` · `EchoMimic` · `FFmpeg` · `Gradio` · `HF ZeroGPU` · `Google Colab (T4)`
 
